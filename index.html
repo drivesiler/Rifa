@@ -330,8 +330,6 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    
-    // Tu URL de KVDB lista para sincronización en tiempo real
     const CLOUD_URL = "https://kvdb.io/FLWKu5aSmguifkdQKwdAXq/rifa"; 
 
     let ticketsData = {};
@@ -343,36 +341,36 @@
         if (CLOUD_URL) {
             fetch(CLOUD_URL)
                 .then(res => {
-                    if (!res.ok) throw new Error("Vacío o nuevo");
+                    if (!res.ok) throw new Error("Vacío");
                     return res.json();
                 })
                 .then(data => {
                     if (data && data.tickets && Object.keys(data.tickets).length > 0) {
                         ticketsData = data.tickets;
                         fechaSorteoTexto = data.fecha || "Por definir";
+                        renderGrid();
+                        actualizarTextosFecha();
                     } else {
-                        crearNuevosTickets();
+                        inicializarNubeNueva();
                     }
-                    actualizarTextosFecha();
-                    renderGrid();
                 })
                 .catch(err => {
-                    // Si el bucket está recién creado y vacío, inicializamos
-                    crearNuevosTickets();
+                    inicializarNubeNueva();
                 });
         }
     }
 
-    function crearNuevosTickets() {
+    function inicializarNubeNueva() {
         ticketsData = {};
         for (let i = 1; i <= 100; i++) {
             ticketsData[i] = { status: 'libre', name: '' };
         }
-        guardarDatos();
+        guardarDatosEnNube();
     }
 
-    function guardarDatos() {
+    function guardarDatosEnNube() {
         actualizarTextosFecha();
+        renderGrid();
 
         if (CLOUD_URL) {
             fetch(CLOUD_URL, {
@@ -438,8 +436,7 @@
         }
 
         ticketsData[selectedNumber] = { status: 'ocupado', name: nombre };
-        guardarDatos();
-        renderGrid();
+        guardarDatosEnNube();
         cerrarModal('modalApartar');
 
         const mensaje = `¡Hola Lenin! Quiero apartar el número *#${selectedNumber}* de la Rifa Solidaria para Nancy Oberto.\n\nMi nombre es: ${nombre}`;
@@ -453,7 +450,6 @@
             ticketsData[selectedNumber].name = '';
         }
         guardarCambiosAdminSinCerrar();
-        renderGrid();
         alert("Estado del número actualizado con éxito.");
     }
 
@@ -472,15 +468,14 @@
             ADMIN_PASSWORD = pInput;
             localStorage.setItem('rifa_pass_v1', ADMIN_PASSWORD);
         }
-        guardarDatos();
+        guardarDatosEnNube();
     }
 
     function resetearTodoPruebas() {
         if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE?")) {
-            crearNuevosTickets();
-            renderGrid();
+            inicializarNubeNueva();
             cerrarModal('modalAdmin');
-            alert("¡Grilla reiniciada!");
+            alert("¡Grilla reiniciada en la nube!");
         }
     }
 
@@ -666,7 +661,7 @@
         link.click();
     }
 
-    // Sincronización en vivo cada 5 segundos para actualizar de inmediato entre dispositivos
+    // Sincronización automática en vivo cada 5 segundos para actualizar entre dispositivos
     setInterval(() => {
         if (CLOUD_URL) initTickets();
     }, 5000);
