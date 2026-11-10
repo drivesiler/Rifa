@@ -20,7 +20,7 @@
             background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -28,54 +28,52 @@
         }
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 440px; /* Optimizado para verse impecable en cualquier cel */
             background: var(--card-bg);
-            padding: 16px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(13, 71, 161, 0.12);
+            padding: 14px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(13, 71, 161, 0.12);
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* Encabezado */
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #eef2f7;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
         .title-box h1 {
             margin: 0;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: var(--blue-dark);
             font-weight: 900;
             letter-spacing: -0.5px;
         }
         .subtitle {
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: #555;
             font-weight: 600;
-            margin-top: -4px;
+            margin-top: -2px;
         }
 
-        /* Zona central: Foto y Tarjetas de Pago */
         .middle-section {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: stretch;
         }
 
         .photo-card {
-            flex: 1.1;
+            flex: 1;
             background: white;
             border: 1px solid #d0d7de;
             border-radius: 8px;
-            padding: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 6px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -83,7 +81,7 @@
         }
         .photo-placeholder {
             width: 100%;
-            height: 180px;
+            height: 160px;
             background: #f0f4f8;
             border: 2px dashed #b0bec5;
             border-radius: 4px;
@@ -91,9 +89,9 @@
             align-items: center;
             justify-content: center;
             color: #78909c;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-align: center;
-            padding: 5px;
+            padding: 4px;
             box-sizing: border-box;
         }
 
@@ -101,47 +99,46 @@
             flex: 1.1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             justify-content: space-between;
         }
         .pay-btn-block {
             background: var(--blue-primary);
             color: white;
             border-radius: 8px;
-            padding: 8px 10px;
+            padding: 6px 8px;
             text-align: center;
-            box-shadow: 0 3px 8px rgba(25, 118, 210, 0.25);
+            box-shadow: 0 2px 6px rgba(25, 118, 210, 0.2);
         }
         .pay-btn-block .label {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             opacity: 0.9;
             font-weight: 700;
         }
         .pay-btn-block .val {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            margin-top: 2px;
-            line-height: 1.2;
+            margin-top: 1px;
+            line-height: 1.15;
         }
 
-        /* Leyenda */
         .legend {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            font-size: 0.72rem;
+            gap: 10px;
+            font-size: 0.7rem;
             color: #4a5568;
-            margin: 4px 0;
+            margin: 2px 0;
         }
         .legend-item { display: flex; align-items: center; gap: 4px; }
-        .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid #cbd5e0; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #cbd5e0; }
         .dot.libre { background: #fff; }
         .dot.ocupado { background: #fffde7; border-color: var(--yellow); }
         .dot.pagado { background: #e8f8f5; border-color: var(--green); }
 
-        /* Grilla */
+        /* Grilla ultra adaptada para celulares */
         .grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -155,7 +152,7 @@
             justify-content: center;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             cursor: pointer;
             border: 1px solid #b0bec5;
             background: #ffffff;
@@ -166,18 +163,17 @@
         .cell.ocupado { background-color: #fffde7; border-color: var(--yellow); color: #7f6000; }
         .cell.pagado { background-color: #e8f8f5; border-color: var(--green); color: #0e6251; }
         
-        .cell .num { font-size: 0.75rem; }
-        .cell .name { font-size: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 92%; text-align: center; }
+        .cell .num { font-size: 0.7rem; }
+        .cell .name { font-size: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 92%; text-align: center; }
 
-        /* Pie de página */
         .footer-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #f8fafc;
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 0.75rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
             border: 1px solid #e2e8f0;
         }
         .footer-info div span { font-weight: bold; color: var(--blue-dark); }
@@ -186,14 +182,12 @@
             background: white;
             border: 2px solid var(--blue-primary);
             color: var(--blue-primary);
-            padding: 6px 12px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 0.75rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 0.7rem;
         }
 
-        /* Modales */
         .modal {
             display: none;
             position: fixed;
@@ -207,32 +201,34 @@
         }
         .modal-content {
             background: white;
-            padding: 20px;
+            padding: 18px;
             border-radius: 16px;
             width: 100%;
-            max-width: 340px;
+            max-width: 320px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .modal-content h3 { margin-top: 0; font-size: 1.1rem; color: var(--blue-dark); }
+        .modal-content h3 { margin-top: 0; font-size: 1.05rem; color: var(--blue-dark); }
         input {
             width: 100%;
-            padding: 10px;
-            margin: 6px 0 14px 0;
+            padding: 9px;
+            margin: 5px 0 10px 0;
             border: 1px solid #cbd5e0;
             border-radius: 8px;
             box-sizing: border-box;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .btn-primary { background: var(--blue-primary); color: white; }
-        .btn-secondary { background: #edf2f7; color: #4a5568; margin-top: 6px; }
+        .btn-secondary { background: #edf2f7; color: #4a5568; margin-top: 5px; }
         
         .admin-footer { text-align: right; margin-top: 2px; }
         .btn-admin-sutil {
@@ -258,7 +254,7 @@
     <div class="middle-section">
         <div class="photo-card">
             <div class="photo-placeholder">
-                <span>[ Espacio Foto de Mamá ]</span>
+                <span>[ Foto de Mamá ]</span>
             </div>
         </div>
 
@@ -273,7 +269,7 @@
             </div>
             <div class="pay-btn-block">
                 <div class="label">Sorteo y Premio</div>
-                <div class="val" id="lblSorteoCard" style="font-size: 0.68rem;">Por definir</div>
+                <div class="val" id="lblSorteoCard" style="font-size: 0.65rem;">Por definir</div>
             </div>
         </div>
     </div>
@@ -288,7 +284,7 @@
 
     <div class="footer-info">
         <div>Sorteo/Premio: <span id="lblSorteoFooter">Por definir</span></div>
-        <button class="thanks-btn">¡Gracias por tu ayuda!</button>
+        <button class="thanks-btn">¡Gracias!</button>
     </div>
 
     <div class="admin-footer">
@@ -296,12 +292,12 @@
     </div>
 </div>
 
-<!-- Modal Apartar (Solo Nombre) -->
+<!-- Modal Apartar -->
 <div class="modal" id="modalApartar">
     <div class="modal-content">
         <h3>Apartar Número #<span id="modalNum"></span></h3>
-        <p style="font-size: 0.8rem; color: #555;">Ingresa tu nombre. Al confirmar, se abrirá tu WhatsApp para notificar a Lenin.</p>
-        <label style="font-size: 0.8rem; font-weight: bold;">Nombre y Apellido:</label>
+        <p style="font-size: 0.78rem; color: #555;">Ingresa tu nombre. Al confirmar, se abrirá tu WhatsApp para notificar a Lenin.</p>
+        <label style="font-size: 0.78rem; font-weight: bold;">Nombre y Apellido:</label>
         <input type="text" id="inputNombre" placeholder="Ej. María Gómez">
         <button class="btn btn-primary" onclick="confirmarApartadoWhatsApp()">Confirmar y Notificar</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalApartar')">Cancelar</button>
@@ -312,29 +308,33 @@
 <div class="modal" id="modalAdmin">
     <div class="modal-content">
         <h3>Panel Administrador</h3>
-        <p style="font-size: 0.85rem;">Número: <b><span id="adminNumText"></span></b></p>
-        <p style="font-size: 0.85rem;">Participante: <span id="adminUserText" style="font-weight:bold; color:var(--blue-primary);"></span></p>
+        <p style="font-size: 0.8rem;">Número: <b><span id="adminNumText"></span></b></p>
+        <p style="font-size: 0.8rem;">Participante: <span id="adminUserText" style="font-weight:bold; color:var(--blue-primary);"></span></p>
         
-        <button class="btn" style="background:var(--green); color:white; margin-bottom:6px;" onclick="cambiarEstado('pagado')">Marcar como PAGADO 💚</button>
-        <button class="btn" style="background:var(--yellow); color:#7f6000; margin-bottom:6px;" onclick="cambiarEstado('ocupado')">Marcar como APARTADO 💛</button>
-        <button class="btn" style="background:#e53e3e; color:white; margin-bottom:10px;" onclick="cambiarEstado('libre')">LIBERAR número ⚪</button>
+        <button class="btn" style="background:var(--green); color:white; margin-bottom:5px;" onclick="cambiarEstado('pagado')">Marcar como PAGADO 💚</button>
+        <button class="btn" style="background:var(--yellow); color:#7f6000; margin-bottom:5px;" onclick="cambiarEstado('ocupado')">Marcar como APARTADO 💛</button>
+        <button class="btn" style="background:#e53e3e; color:white; margin-bottom:8px;" onclick="cambiarEstado('libre')">LIBERAR número ⚪</button>
         
-        <label style="font-size: 0.8rem; font-weight:bold;">Fecha y Premio:</label>
-        <input type="text" id="inputFechaSorteo" placeholder="Ej. 30 DIC - Premio X" style="margin-bottom:10px;">
+        <label style="font-size: 0.75rem; font-weight:bold;">Fecha y Premio:</label>
+        <input type="text" id="inputFechaSorteo" placeholder="Ej. 30 DIC - Premio X" style="margin-bottom:8px;">
 
-        <button class="btn btn-primary" style="background:var(--blue-dark); margin-bottom:6px;" onclick="descargarImagenEstado()">📱 Descargar Imagen para Historia</button>
-        <button class="btn" style="background:#d9534f; color:white; margin-bottom:6px;" onclick="resetearTodoPruebas()">🔄 Reiniciar Todos los Números (Pruebas)</button>
+        <label style="font-size: 0.75rem; font-weight:bold;">Cambiar Contraseña Admin:</label>
+        <input type="text" id="inputNuevaPass" placeholder="Nueva clave" style="margin-bottom:8px;">
+
+        <button class="btn btn-primary" style="background:var(--blue-dark); margin-bottom:5px;" onclick="descargarImagenEstado()">📱 Descargar Imagen para Historia</button>
+        <button class="btn" style="background:#d9534f; color:white; margin-bottom:5px;" onclick="resetearTodoPruebas()">🔄 Reiniciar Números (Pruebas)</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalAdmin')">Cerrar</button>
     </div>
 </div>
 
 <script>
-    const ADMIN_PASSWORD = "1234";
+    // Clave de administrador inicial (puedes cambiarla luego en el panel)
+    let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
     
-    // 🌐 PEGA AQUÍ TU ENLACE DE NPOINT.IO CUANDO LO CREES EN LA NUBE
+    // 🌐 PEGA AQUÍ TU ENLACE DE NPOINT.IO PARA LA SINCRONIZACIÓN EN VIVO
     const NPOINT_URL = ""; 
 
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v10';
+    const STORAGE_KEY = 'rifa_solidaria_nancy_v11';
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
@@ -433,6 +433,7 @@
             document.getElementById('adminNumText').innerText = num;
             document.getElementById('adminUserText').innerText = t.name || 'Ninguno';
             document.getElementById('inputFechaSorteo').value = fechaSorteoTexto;
+            document.getElementById('inputNuevaPass').value = "";
             document.getElementById('modalAdmin').style.display = 'flex';
         } else {
             if (t.status === 'libre') {
@@ -447,7 +448,6 @@
 
     function confirmarApartadoWhatsApp() {
         const nombre = document.getElementById('inputNombre').value.trim();
-
         if (!nombre) {
             alert('Por favor ingresa tu nombre y apellido.');
             return;
@@ -468,8 +468,16 @@
         if (nuevoEstado === 'libre') {
             ticketsData[selectedNumber].name = '';
         }
+        
         const fInput = document.getElementById('inputFechaSorteo').value.trim();
         if (fInput) fechaSorteoTexto = fInput;
+
+        const pInput = document.getElementById('inputNuevaPass').value.trim();
+        if (pInput) {
+            ADMIN_PASSWORD = pInput;
+            localStorage.setItem('rifa_pass_v1', ADMIN_PASSWORD);
+            alert("¡Contraseña de administrador actualizada con éxito!");
+        }
 
         guardarDatos();
         renderGrid();
@@ -478,11 +486,11 @@
     }
 
     function resetearTodoPruebas() {
-        if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE para tus pruebas?")) {
+        if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE?")) {
             crearNuevosTickets();
             renderGrid();
             cerrarModal('modalAdmin');
-            alert("¡Grilla reiniciada por completo!");
+            alert("¡Grilla reiniciada!");
         }
     }
 
@@ -500,7 +508,6 @@
         }
     }
 
-    // --- GENERADOR DE IMAGEN PARA HISTORIA DE WHATSAPP (1080x1920) ---
     function descargarImagenEstado() {
         const fInput = document.getElementById('inputFechaSorteo').value.trim();
         if (fInput) fechaSorteoTexto = fInput;
@@ -673,7 +680,7 @@
 
     setInterval(() => {
         if (NPOINT_URL) initTickets();
-    }, 8000);
+    }, 6000);
 
     initTickets();
 </script>
