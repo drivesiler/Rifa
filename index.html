@@ -254,7 +254,7 @@
     <div class="middle-section">
         <div class="photo-card">
             <div class="photo-placeholder">
-                <span>[ Foto de Mamá ]</span>
+                <span>[ Espacio Foto de Mamá ]</span>
             </div>
         </div>
 
@@ -330,8 +330,6 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    
-    // Enlace de Npoint insertado correctamente
     const NPOINT_URL = "https://api.npoint.io/46df7c99933a362145b2"; 
 
     const STORAGE_KEY = 'rifa_solidaria_nancy_v13';
@@ -345,28 +343,37 @@
             fetch(NPOINT_URL)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.tickets) {
+                    // Validar si npoint trajo tickets válidos
+                    if (data && data.tickets && Object.keys(data.tickets).length > 0) {
                         ticketsData = data.tickets;
                         fechaSorteoTexto = data.fecha || "Por definir";
+                        // Guardar copia local segura
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
+                        localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
                     } else {
-                        crearNuevosTickets();
+                        // Si npoint está vacío, intentamos cargar local o inicializar
+                        cargarLocalOIndicializar();
                     }
                     actualizarTextosFecha();
                     renderGrid();
                 })
                 .catch(err => {
-                    console.error("Error cargando de npoint, usando local:", err);
-                    cargarLocal();
+                    console.error("Error conectando a npoint, usando datos locales:", err);
+                    cargarLocalOIndicializar();
                 });
         } else {
-            cargarLocal();
+            cargarLocalOIndicializar();
         }
     }
 
-    function cargarLocal() {
+    function cargarLocalOIndicializar() {
         const savedData = localStorage.getItem(STORAGE_KEY);
         if (savedData) {
-            try { ticketsData = JSON.parse(savedData); } catch (e) { crearNuevosTickets(); }
+            try { 
+                ticketsData = JSON.parse(savedData); 
+            } catch (e) { 
+                crearNuevosTickets(); 
+            }
         } else {
             crearNuevosTickets();
         }
@@ -682,6 +689,7 @@
         link.click();
     }
 
+    // Sincronización automática cada 5 segundos para ver cambios en vivo en todos los tlf
     setInterval(() => {
         if (NPOINT_URL) initTickets();
     }, 5000);
