@@ -330,34 +330,40 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    const NPOINT_URL = "https://api.npoint.io/46df7c99933a362145b2"; 
+    
+    // 🌐 CONFIGURACIÓN JSONBIN.IO (Sincronización Real en Vivo)
+    const JSONBIN_ID = "6af321a0ac6210605a7d147f"; 
+    const JSONBIN_KEY = "$2a$10$iTo5N4TOufVOHCxZ1VB3XOCWvtTKSSk2pO2U72ZnWQ5htGtG/wQCq"; 
 
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v13';
+    const STORAGE_KEY = 'rifa_solidaria_nancy_v14';
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        if (NPOINT_URL) {
-            fetch(NPOINT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.tickets && Object.keys(data.tickets).length > 0) {
-                        ticketsData = data.tickets;
-                        fechaSorteoTexto = data.fecha || "Por definir";
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
-                        localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
-                    } else {
-                        cargarLocalOIndicializar();
-                    }
-                    actualizarTextosFecha();
-                    renderGrid();
-                })
-                .catch(err => {
-                    console.error("Error conectando a npoint, usando datos locales:", err);
+        if (JSONBIN_ID && JSONBIN_ID !== "6af321a0ac6210605a7d147f") {
+            fetch(`https://api.jsonbin.io/v3/b/${6af321a0ac6210605a7d147f}/latest`, {
+                headers: { 'X-Master-Key': JSONBIN_KEY }
+            })
+            .then(res => res.json())
+            .then(resData => {
+                const data = resData.record;
+                if (data && data.tickets && Object.keys(data.tickets).length > 0) {
+                    ticketsData = data.tickets;
+                    fechaSorteoTexto = data.fecha || "Por definir";
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
+                    localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
+                } else {
                     cargarLocalOIndicializar();
-                });
+                }
+                actualizarTextosFecha();
+                renderGrid();
+            })
+            .catch(err => {
+                console.error("Error cargando de jsonbin:", err);
+                cargarLocalOIndicializar();
+            });
         } else {
             cargarLocalOIndicializar();
         }
@@ -366,11 +372,7 @@
     function cargarLocalOIndicializar() {
         const savedData = localStorage.getItem(STORAGE_KEY);
         if (savedData) {
-            try { 
-                ticketsData = JSON.parse(savedData); 
-            } catch (e) { 
-                crearNuevosTickets(); 
-            }
+            try { ticketsData = JSON.parse(savedData); } catch (e) { crearNuevosTickets(); }
         } else {
             crearNuevosTickets();
         }
@@ -394,12 +396,15 @@
         localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
         actualizarTextosFecha();
 
-        if (NPOINT_URL) {
-            fetch(NPOINT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+        if (JSONBIN_ID && JSONBIN_ID !== "PEGA_AQUI_TU_BIN_ID") {
+            fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_KEY
+                },
                 body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
-            }).catch(err => console.log("Error guardando en npoint"));
+            }).catch(err => console.log("Error guardando en jsonbin"));
         }
     }
 
@@ -480,7 +485,7 @@
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito en la nube y el sistema!");
+        alert("¡Cambios guardados con éxito en la nube y sincronizados!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -686,9 +691,10 @@
         link.click();
     }
 
+    // Sincronización en vivo cada 4 segundos consultando a JSONBin
     setInterval(() => {
-        if (NPOINT_URL) initTickets();
-    }, 5000);
+        if (JSONBIN_ID && JSONBIN_ID !== "PEGA_AQUI_TU_BIN_ID") initTickets();
+    }, 4000);
 
     initTickets();
 </script>
