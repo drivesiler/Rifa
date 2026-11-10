@@ -331,19 +331,21 @@
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
     
-    // Tu enlace de npoint ya integrado
-    const NPOINT_URL = "https://api.npoint.io/88133488bcbd82bdc6f2"; 
+    // Tu URL de KVDB lista para sincronización en tiempo real
+    const CLOUD_URL = "https://kvdb.io/FLWKu5aSmguifkdQKwdAXq/rifa"; 
 
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v16';
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        if (NPOINT_URL && NPOINT_URL !== "") {
-            fetch(NPOINT_URL)
-                .then(res => res.json())
+        if (CLOUD_URL) {
+            fetch(CLOUD_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error("Vacío o nuevo");
+                    return res.json();
+                })
                 .then(data => {
                     if (data && data.tickets && Object.keys(data.tickets).length > 0) {
                         ticketsData = data.tickets;
@@ -355,26 +357,10 @@
                     renderGrid();
                 })
                 .catch(err => {
-                    console.error("Error conectando a npoint, usando respaldo local:", err);
-                    cargarLocal();
+                    // Si el bucket está recién creado y vacío, inicializamos
+                    crearNuevosTickets();
                 });
-        } else {
-            cargarLocal();
         }
-    }
-
-    function cargarLocal() {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-            try { ticketsData = JSON.parse(savedData); } catch (e) { crearNuevosTickets(); }
-        } else {
-            crearNuevosTickets();
-        }
-        const savedFecha = localStorage.getItem(STORAGE_KEY + '_fecha');
-        if (savedFecha) fechaSorteoTexto = savedFecha;
-        
-        actualizarTextosFecha();
-        renderGrid();
     }
 
     function crearNuevosTickets() {
@@ -386,16 +372,14 @@
     }
 
     function guardarDatos() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
-        localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
         actualizarTextosFecha();
 
-        if (NPOINT_URL && NPOINT_URL !== "") {
-            fetch(NPOINT_URL, {
+        if (CLOUD_URL) {
+            fetch(CLOUD_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
-            }).catch(err => console.log("Error guardando en npoint"));
+            }).catch(err => console.log("Error guardando en KVDB"));
         }
     }
 
@@ -476,7 +460,7 @@
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito en npoint y sincronizados!");
+        alert("¡Cambios guardados con éxito en la nube KVDB!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -682,10 +666,10 @@
         link.click();
     }
 
-    // Sincronización automática en vivo cada 6 segundos consultando a npoint
+    // Sincronización en vivo cada 5 segundos para actualizar de inmediato entre dispositivos
     setInterval(() => {
-        if (NPOINT_URL && NPOINT_URL !== "") initTickets();
-    }, 6000);
+        if (CLOUD_URL) initTickets();
+    }, 5000);
 
     initTickets();
 </script>
