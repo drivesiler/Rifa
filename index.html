@@ -330,7 +330,7 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    const CLOUD_URL = "https://kvdb.io/FLWKu5aSmguifkdQKwdAXq/rifa"; 
+    const KVDB_URL = "https://kvdb.io/FLWKu5aSmguifkdQKwdAXq/rifa"; 
 
     let ticketsData = {};
     let selectedNumber = null;
@@ -338,26 +338,24 @@
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        if (CLOUD_URL) {
-            fetch(CLOUD_URL)
-                .then(res => {
-                    if (!res.ok) throw new Error("Vacío");
-                    return res.json();
-                })
-                .then(data => {
-                    if (data && data.tickets && Object.keys(data.tickets).length > 0) {
-                        ticketsData = data.tickets;
-                        fechaSorteoTexto = data.fecha || "Por definir";
-                        renderGrid();
-                        actualizarTextosFecha();
-                    } else {
-                        inicializarNubeNueva();
-                    }
-                })
-                .catch(err => {
+        fetch(KVDB_URL)
+            .then(res => {
+                if (!res.ok) throw new Error("Vacío");
+                return res.json();
+            })
+            .then(data => {
+                if (data && data.tickets && Object.keys(data.tickets).length > 0) {
+                    ticketsData = data.tickets;
+                    fechaSorteoTexto = data.fecha || "Por definir";
+                    renderGrid();
+                    actualizarTextosFecha();
+                } else {
                     inicializarNubeNueva();
-                });
-        }
+                }
+            })
+            .catch(err => {
+                inicializarNubeNueva();
+            });
     }
 
     function inicializarNubeNueva() {
@@ -372,13 +370,12 @@
         actualizarTextosFecha();
         renderGrid();
 
-        if (CLOUD_URL) {
-            fetch(CLOUD_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
-            }).catch(err => console.log("Error guardando en KVDB"));
-        }
+        // KVDB acepta método PUT de manera nativa y directa desde navegadores sin bloqueos CORS
+        fetch(KVDB_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
+        }).catch(err => console.log("Error guardando en KVDB:", err));
     }
 
     function actualizarTextosFecha() {
@@ -661,9 +658,9 @@
         link.click();
     }
 
-    // Sincronización automática en vivo cada 5 segundos para actualizar entre dispositivos
+    // Sincronización automática en vivo cada 5 segundos para actualizar de inmediato entre dispositivos
     setInterval(() => {
-        if (CLOUD_URL) initTickets();
+        initTickets();
     }, 5000);
 
     initTickets();
