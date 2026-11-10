@@ -308,7 +308,7 @@
 <div class="modal" id="modalAdmin">
     <div class="modal-content">
         <h3>Panel Administrador</h3>
-        <p style="font-size: 0.8rem;">Número: <b><span id="adminNumText"></span></b></p>
+        <p style="font-size: 0.8rem;">Número seleccionado: <b><span id="adminNumText"></span></b></p>
         <p style="font-size: 0.8rem;">Participante: <span id="adminUserText" style="font-weight:bold; color:var(--blue-primary);"></span></p>
         
         <button class="btn" style="background:var(--green); color:white; margin-bottom:5px;" onclick="cambiarEstado('pagado')">Marcar como PAGADO 💚</button>
@@ -330,9 +330,11 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    const NPOINT_URL = ""; 
+    
+    // Enlace de Npoint insertado correctamente
+    const NPOINT_URL = "https://api.npoint.io/46df7c99933a362145b2"; 
 
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v12';
+    const STORAGE_KEY = 'rifa_solidaria_nancy_v13';
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
@@ -474,7 +476,7 @@
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito!");
+        alert("¡Cambios guardados con éxito en la nube y el sistema!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -682,7 +684,7 @@
 
     setInterval(() => {
         if (NPOINT_URL) initTickets();
-    }, 6000);
+    }, 5000);
 
     initTickets();
 </script>
