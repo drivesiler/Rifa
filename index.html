@@ -12,8 +12,8 @@
             --text-main: #1d3557;
             --blue-primary: #1976d2;
             --blue-dark: #0d47a1;
-            --yellow: #f1c40f;
             --green: #27ae60;
+            --red: #e74c3c;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -135,8 +135,8 @@
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #cbd5e0; }
         .dot.libre { background: #fff; }
-        .dot.ocupado { background: #fffde7; border-color: var(--yellow); }
-        .dot.pagado { background: #e8f8f5; border-color: var(--green); }
+        .dot.ocupado { background: #e8f8f5; border-color: var(--green); }
+        .dot.pagado { background: #fadbd8; border-color: var(--red); }
 
         .grid {
             display: grid;
@@ -159,8 +159,8 @@
             transition: transform 0.1s;
         }
         .cell:active { transform: scale(0.9); }
-        .cell.ocupado { background-color: #fffde7; border-color: var(--yellow); color: #7f6000; }
-        .cell.pagado { background-color: #e8f8f5; border-color: var(--green); color: #0e6251; }
+        .cell.ocupado { background-color: #e8f8f5; border-color: #27ae60; color: #0e6251; }
+        .cell.pagado { background-color: #fadbd8; border-color: #e74c3c; color: #78281f; }
         
         .cell .num { font-size: 0.7rem; }
         .cell .name { font-size: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 92%; text-align: center; }
@@ -254,7 +254,7 @@
     <div class="middle-section">
         <div class="photo-card">
             <div class="photo-placeholder">
-                <span>[ Espacio Foto de Mamá ]</span>
+                <span>[ Foto de Mamá ]</span>
             </div>
         </div>
 
@@ -276,8 +276,8 @@
 
     <div class="legend">
         <div class="legend-item"><div class="dot libre"></div> Libre</div>
-        <div class="legend-item"><div class="dot ocupado"></div> Apartado 💛</div>
-        <div class="legend-item"><div class="dot pagado"></div> Pagado 💚</div>
+        <div class="legend-item"><div class="dot ocupado"></div> Apartado 💚</div>
+        <div class="legend-item"><div class="dot pagado"></div> Pagado ❤️</div>
     </div>
 
     <div class="grid" id="numberGrid"></div>
@@ -311,8 +311,8 @@
         <p style="font-size: 0.8rem;">Número seleccionado: <b><span id="adminNumText"></span></b></p>
         <p style="font-size: 0.8rem;">Participante: <span id="adminUserText" style="font-weight:bold; color:var(--blue-primary);"></span></p>
         
-        <button class="btn" style="background:var(--green); color:white; margin-bottom:5px;" onclick="cambiarEstado('pagado')">Marcar como PAGADO 💚</button>
-        <button class="btn" style="background:var(--yellow); color:#7f6000; margin-bottom:5px;" onclick="cambiarEstado('ocupado')">Marcar como APARTADO 💛</button>
+        <button class="btn" style="background:var(--red); color:white; margin-bottom:5px;" onclick="cambiarEstado('pagado')">Marcar como PAGADO ❤️</button>
+        <button class="btn" style="background:var(--green); color:white; margin-bottom:5px;" onclick="cambiarEstado('ocupado')">Marcar como APARTADO 💚</button>
         <button class="btn" style="background:#e53e3e; color:white; margin-bottom:8px;" onclick="cambiarEstado('libre')">LIBERAR número ⚪</button>
         
         <label style="font-size: 0.75rem; font-weight:bold;">Fecha y Premio:</label>
@@ -343,15 +343,12 @@
             fetch(NPOINT_URL)
                 .then(res => res.json())
                 .then(data => {
-                    // Validar si npoint trajo tickets válidos
                     if (data && data.tickets && Object.keys(data.tickets).length > 0) {
                         ticketsData = data.tickets;
                         fechaSorteoTexto = data.fecha || "Por definir";
-                        // Guardar copia local segura
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
                         localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
                     } else {
-                        // Si npoint está vacío, intentamos cargar local o inicializar
                         cargarLocalOIndicializar();
                     }
                     actualizarTextosFecha();
@@ -420,8 +417,8 @@
             cell.className = `cell ${t.status}`;
             
             let indicador = '';
-            if (t.status === 'ocupado') indicador = '💛 ';
-            if (t.status === 'pagado') indicador = '💚 ';
+            if (t.status === 'ocupado') indicador = '💚 ';
+            if (t.status === 'pagado') indicador = '❤️ ';
 
             cell.innerHTML = `
                 <span class="num">${i}</span>
@@ -632,11 +629,11 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.strokeStyle = "#cbd5e1";
             } else if (t.status === 'ocupado') {
-                ctx.fillStyle = "#fffde7"; 
-                ctx.strokeStyle = "#f1c40f";
-            } else if (t.status === 'pagado') {
                 ctx.fillStyle = "#e8f8f5"; 
                 ctx.strokeStyle = "#27ae60";
+            } else if (t.status === 'pagado') {
+                ctx.fillStyle = "#fadbd8"; 
+                ctx.strokeStyle = "#e74c3c";
             }
 
             ctx.lineWidth = 2;
@@ -650,10 +647,10 @@
 
             if (t.status === 'ocupado') {
                 ctx.font = "20px sans-serif";
-                ctx.fillText("💛", x + size / 2, y + 68);
+                ctx.fillText("💚", x + size / 2, y + 68);
             } else if (t.status === 'pagado') {
                 ctx.font = "20px sans-serif";
-                ctx.fillText("💚", x + size / 2, y + 68);
+                ctx.fillText("❤️", x + size / 2, y + 68);
             }
         }
 
@@ -689,7 +686,6 @@
         link.click();
     }
 
-    // Sincronización automática cada 5 segundos para ver cambios en vivo en todos los tlf
     setInterval(() => {
         if (NPOINT_URL) initTickets();
     }, 5000);
