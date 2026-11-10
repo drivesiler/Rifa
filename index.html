@@ -28,7 +28,7 @@
         }
         .container {
             width: 100%;
-            max-width: 440px; /* Optimizado para verse impecable en cualquier cel */
+            max-width: 440px;
             background: var(--card-bg);
             padding: 14px;
             border-radius: 20px;
@@ -138,7 +138,6 @@
         .dot.ocupado { background: #fffde7; border-color: var(--yellow); }
         .dot.pagado { background: #e8f8f5; border-color: var(--green); }
 
-        /* Grilla ultra adaptada para celulares */
         .grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -185,7 +184,8 @@
             padding: 4px 8px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
+            text-align: center;
         }
 
         .modal {
@@ -283,8 +283,8 @@
     <div class="grid" id="numberGrid"></div>
 
     <div class="footer-info">
-        <div>Sorteo/Premio: <span id="lblSorteoFooter">Por definir</span></div>
-        <button class="thanks-btn">¡Gracias!</button>
+        <div>Sorteo: <span id="lblSorteoFooter">Por definir</span></div>
+        <div class="thanks-btn">¡Gracias por tu apoyo.<br>Bendiciones!</div>
     </div>
 
     <div class="admin-footer">
@@ -318,9 +318,10 @@
         <label style="font-size: 0.75rem; font-weight:bold;">Fecha y Premio:</label>
         <input type="text" id="inputFechaSorteo" placeholder="Ej. 30 DIC - Premio X" style="margin-bottom:8px;">
 
-        <label style="font-size: 0.75rem; font-weight:bold;">Cambiar Contraseña Admin:</label>
-        <input type="text" id="inputNuevaPass" placeholder="Nueva clave" style="margin-bottom:8px;">
+        <label style="font-size: 0.75rem; font-weight:bold;">Nueva Contraseña Admin (Opcional):</label>
+        <input type="text" id="inputNuevaPass" placeholder="Dejar en blanco si no deseas cambiarla" style="margin-bottom:8px;">
 
+        <button class="btn btn-primary" style="background:#27ae60; margin-bottom:8px;" onclick="guardarCambiosAdmin()">💾 Guardar Cambios</button>
         <button class="btn btn-primary" style="background:var(--blue-dark); margin-bottom:5px;" onclick="descargarImagenEstado()">📱 Descargar Imagen para Historia</button>
         <button class="btn" style="background:#d9534f; color:white; margin-bottom:5px;" onclick="resetearTodoPruebas()">🔄 Reiniciar Números (Pruebas)</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalAdmin')">Cerrar</button>
@@ -328,13 +329,10 @@
 </div>
 
 <script>
-    // Clave de administrador inicial (puedes cambiarla luego en el panel)
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    
-    // 🌐 PEGA AQUÍ TU ENLACE DE NPOINT.IO PARA LA SINCRONIZACIÓN EN VIVO
     const NPOINT_URL = ""; 
 
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v11';
+    const STORAGE_KEY = 'rifa_solidaria_nancy_v12';
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
@@ -468,7 +466,18 @@
         if (nuevoEstado === 'libre') {
             ticketsData[selectedNumber].name = '';
         }
-        
+        guardarCambiosAdminSinCerrar();
+        renderGrid();
+        alert("Estado del número actualizado con éxito.");
+    }
+
+    function guardarCambiosAdmin() {
+        guardarCambiosAdminSinCerrar();
+        cerrarModal('modalAdmin');
+        alert("¡Cambios guardados con éxito!");
+    }
+
+    function guardarCambiosAdminSinCerrar() {
         const fInput = document.getElementById('inputFechaSorteo').value.trim();
         if (fInput) fechaSorteoTexto = fInput;
 
@@ -476,13 +485,8 @@
         if (pInput) {
             ADMIN_PASSWORD = pInput;
             localStorage.setItem('rifa_pass_v1', ADMIN_PASSWORD);
-            alert("¡Contraseña de administrador actualizada con éxito!");
         }
-
         guardarDatos();
-        renderGrid();
-        cerrarModal('modalAdmin');
-        alert("Estado actualizado con éxito.");
     }
 
     function resetearTodoPruebas() {
@@ -509,9 +513,7 @@
     }
 
     function descargarImagenEstado() {
-        const fInput = document.getElementById('inputFechaSorteo').value.trim();
-        if (fInput) fechaSorteoTexto = fInput;
-        guardarDatos();
+        guardarCambiosAdminSinCerrar();
 
         const canvas = document.createElement('canvas');
         canvas.width = 1080;
@@ -663,14 +665,14 @@
         ctx.strokeStyle = "#1976d2";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.roundRect(645, footerY + 14, 305, 58, 8);
+        ctx.roundRect(620, footerY + 12, 335, 60, 8);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#1976d2";
-        ctx.font = "bold 26px sans-serif";
+        ctx.font = "bold 22px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("¡Gracias por tu ayuda!", 797, footerY + 53);
+        ctx.fillText("¡Gracias por tu apoyo. Bendiciones!", 787, footerY + 48);
 
         const link = document.createElement('a');
         link.download = 'Rifa_Solidaria_Nancy_Oberto.png';
