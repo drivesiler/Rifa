@@ -330,47 +330,43 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    const NPOINT_URL = "https://api.npoint.io/46df7c99933a362145b2"; 
+    
+    // Tu enlace de npoint ya integrado
+    const NPOINT_URL = "https://api.npoint.io/88133488bcbd82bdc6f2"; 
 
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v13';
+    const STORAGE_KEY = 'rifa_solidaria_nancy_v16';
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        if (NPOINT_URL) {
+        if (NPOINT_URL && NPOINT_URL !== "") {
             fetch(NPOINT_URL)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.tickets && Object.keys(data.tickets).length > 0) {
                         ticketsData = data.tickets;
                         fechaSorteoTexto = data.fecha || "Por definir";
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
-                        localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
                     } else {
-                        cargarLocalOIndicializar();
+                        crearNuevosTickets();
                     }
                     actualizarTextosFecha();
                     renderGrid();
                 })
                 .catch(err => {
-                    console.error("Error conectando a npoint, usando datos locales:", err);
-                    cargarLocalOIndicializar();
+                    console.error("Error conectando a npoint, usando respaldo local:", err);
+                    cargarLocal();
                 });
         } else {
-            cargarLocalOIndicializar();
+            cargarLocal();
         }
     }
 
-    function cargarLocalOIndicializar() {
+    function cargarLocal() {
         const savedData = localStorage.getItem(STORAGE_KEY);
         if (savedData) {
-            try { 
-                ticketsData = JSON.parse(savedData); 
-            } catch (e) { 
-                crearNuevosTickets(); 
-            }
+            try { ticketsData = JSON.parse(savedData); } catch (e) { crearNuevosTickets(); }
         } else {
             crearNuevosTickets();
         }
@@ -394,7 +390,7 @@
         localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
         actualizarTextosFecha();
 
-        if (NPOINT_URL) {
+        if (NPOINT_URL && NPOINT_URL !== "") {
             fetch(NPOINT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -480,7 +476,7 @@
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito en la nube y el sistema!");
+        alert("¡Cambios guardados con éxito en npoint y sincronizados!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -686,9 +682,10 @@
         link.click();
     }
 
+    // Sincronización automática en vivo cada 6 segundos consultando a npoint
     setInterval(() => {
-        if (NPOINT_URL) initTickets();
-    }, 5000);
+        if (NPOINT_URL && NPOINT_URL !== "") initTickets();
+    }, 6000);
 
     initTickets();
 </script>
