@@ -330,57 +330,40 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
+    const STORAGE_KEY = 'rifa_solidaria_nancy_v18';
     
-    // Credenciales oficiales de JSONBin.io integradas
-    const BIN_ID = "6af3c367ac6210605a7e7138"; 
-    const API_KEY = "$2a$10$iTo5N4TOufVOHCxZ1VB3XOCWvtTKSSk2pO2U72ZnWQ5htGtG/wQCq"; 
-
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: { 'X-Master-Key': API_KEY }
-        })
-        .then(res => res.json())
-        .then(resData => {
-            const data = resData.record;
-            if (data && data.tickets && Object.keys(data.tickets).length > 0) {
-                ticketsData = data.tickets;
-                fechaSorteoTexto = data.fecha || "Por definir";
-                renderGrid();
-                actualizarTextosFecha();
-            } else {
-                inicializarNubeNueva();
-            }
-        })
-        .catch(err => {
-            console.error("Error conectando a JSONBin:", err);
-        });
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            try { ticketsData = JSON.parse(savedData); } catch (e) { crearNuevosTickets(); }
+        } else {
+            crearNuevosTickets();
+        }
+        const savedFecha = localStorage.getItem(STORAGE_KEY + '_fecha');
+        if (savedFecha) fechaSorteoTexto = savedFecha;
+        
+        actualizarTextosFecha();
+        renderGrid();
     }
 
-    function inicializarNubeNueva() {
+    function crearNuevosTickets() {
         ticketsData = {};
         for (let i = 1; i <= 100; i++) {
             ticketsData[i] = { status: 'libre', name: '' };
         }
-        guardarDatosEnNube();
+        guardarDatos();
     }
 
-    function guardarDatosEnNube() {
+    function guardarDatos() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
+        localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
         actualizarTextosFecha();
         renderGrid();
-
-        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY
-            },
-            body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
-        }).catch(err => console.log("Error guardando en JSONBin:", err));
     }
 
     function actualizarTextosFecha() {
@@ -437,19 +420,24 @@
             return;
         }
 
-        ticketsData[selectedNumber] = { status: 'ocupado', name: nombre };
-        guardarDatosEnNube();
-        cerrarModal('modalApartar');
-
+        // Preparamos el mensaje para tu WhatsApp directamente
         const mensaje = `¡Hola Lenin! Quiero apartar el número *#${selectedNumber}* de la Rifa Solidaria para Nancy Oberto.\n\nMi nombre es: ${nombre}`;
         const urlWhatsApp = `https://wa.me/584127808811?text=${encodeURIComponent(mensaje)}`;
+        
         window.open(urlWhatsApp, '_blank');
+        cerrarModal('modalApartar');
     }
 
     function cambiarEstado(nuevoEstado) {
         ticketsData[selectedNumber].status = nuevoEstado;
         if (nuevoEstado === 'libre') {
             ticketsData[selectedNumber].name = '';
+        } else {
+            // Si el admin lo marca como apartado o pagado desde su panel, pide el nombre rápido
+            let nombreAdmin = prompt("Nombre del participante para este número:", ticketsData[selectedNumber].name || "");
+            if (nombreAdmin !== null) {
+                ticketsData[selectedNumber].name = nombreAdmin.trim();
+            }
         }
         guardarCambiosAdminSinCerrar();
         alert("Estado del número actualizado con éxito.");
@@ -458,7 +446,7 @@
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito en la nube JSONBin!");
+        alert("¡Cambios guardados con éxito!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -470,14 +458,14 @@
             ADMIN_PASSWORD = pInput;
             localStorage.setItem('rifa_pass_v1', ADMIN_PASSWORD);
         }
-        guardarDatosEnNube();
+        guardarDatos();
     }
 
     function resetearTodoPruebas() {
         if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE?")) {
-            inicializarNubeNueva();
+            crearNuevosTickets();
             cerrarModal('modalAdmin');
-            alert("¡Grilla reiniciada en la nube!");
+            alert("¡Grilla reiniciada!");
         }
     }
 
@@ -662,11 +650,6 @@
         link.href = canvas.toDataURL('image/png');
         link.click();
     }
-
-    // Sincronización automática en vivo cada 6 segundos consultando la nube
-    setInterval(() => {
-        initTickets();
-    }, 6000);
 
     initTickets();
 </script>
