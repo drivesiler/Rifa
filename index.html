@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rifa Solidaria - Nancy Oberto</title>
+    <!-- Importamos fuente elegante tipo script / mano alzada desde Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-top: #e3f2fd;
@@ -16,7 +18,7 @@
             --red: #e74c3c;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
             color: var(--text-main);
             margin: 0;
@@ -41,24 +43,26 @@
 
         .header-row {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             border-bottom: 2px solid #eef2f7;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
         .title-box h1 {
             margin: 0;
-            font-size: 1.3rem;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5rem;
             color: var(--blue-dark);
-            font-weight: 900;
-            letter-spacing: -0.5px;
+            text-align: center;
+            font-weight: normal;
+            letter-spacing: 1px;
         }
         .subtitle {
             text-align: center;
             font-size: 0.78rem;
             color: #555;
             font-weight: 600;
-            margin-top: -2px;
+            margin-top: -4px;
         }
 
         .middle-section {
@@ -151,10 +155,11 @@
             justify-content: center;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             cursor: pointer;
             border: 1px solid #b0bec5;
             background: #ffffff;
+            color: #1d3557;
             user-select: none;
             transition: transform 0.1s;
         }
@@ -162,7 +167,7 @@
         .cell.ocupado { background-color: #e8f8f5; border-color: #27ae60; color: #0e6251; }
         .cell.pagado { background-color: #fadbd8; border-color: #e74c3c; color: #78281f; }
         
-        .cell .num { font-size: 0.7rem; }
+        .cell .num { font-size: 0.75rem; }
         .cell .name { font-size: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 92%; text-align: center; }
 
         .footer-info {
@@ -246,7 +251,7 @@
 <div class="container">
     <div class="header-row">
         <div class="title-box">
-            <h1 style="color: var(--blue-dark);">RIFA SOLIDARIA</h1>
+            <h1>Rifa Solidaria</h1>
         </div>
     </div>
     <div class="subtitle">Gastos post-operatorios • Nancy Oberto</div>
@@ -296,10 +301,10 @@
 <div class="modal" id="modalApartar">
     <div class="modal-content">
         <h3>Apartar Número #<span id="modalNum"></span></h3>
-        <p style="font-size: 0.78rem; color: #555;">Ingresa tu nombre. Al confirmar, se guardará en directo y se abrirá tu WhatsApp para notificar a Lenin.</p>
+        <p style="font-size: 0.78rem; color: #555;">Ingresa tu nombre. Al confirmar, se abrirá tu WhatsApp para notificar a Lenin.</p>
         <label style="font-size: 0.78rem; font-weight: bold;">Nombre y Apellido:</label>
         <input type="text" id="inputNombre" placeholder="Ej. María Gómez">
-        <button class="btn btn-primary" onclick="confirmarApartadoWhatsApp()">Confirmar, Guardar y Notificar</button>
+        <button class="btn btn-primary" onclick="confirmarApartadoWhatsApp()">Confirmar y Notificar</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalApartar')">Cancelar</button>
     </div>
 </div>
@@ -321,7 +326,7 @@
         <label style="font-size: 0.75rem; font-weight:bold;">Nueva Contraseña Admin (Opcional):</label>
         <input type="text" id="inputNuevaPass" placeholder="Dejar en blanco si no deseas cambiarla" style="margin-bottom:8px;">
 
-        <button class="btn btn-primary" style="background:#27ae60; margin-bottom:8px;" onclick="guardarCambiosAdmin()">💾 Guardar en Directo</button>
+        <button class="btn btn-primary" style="background:#27ae60; margin-bottom:8px;" onclick="guardarCambiosAdmin()">💾 Guardar Cambios</button>
         <button class="btn btn-primary" style="background:var(--blue-dark); margin-bottom:5px;" onclick="descargarImagenEstado()">📱 Descargar Imagen para Historia</button>
         <button class="btn" style="background:#d9534f; color:white; margin-bottom:5px;" onclick="resetearTodoPruebas()">🔄 Reiniciar Números (Pruebas)</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalAdmin')">Cerrar</button>
@@ -330,8 +335,6 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    
-    // Usamos JSONBin en modo público optimizado para lectura y escritura directa sin restricciones de cabeceras
     const BIN_ID = "6af3c367ac6210605a7e7138";
     const API_KEY = "$2a$10$iTo5N4TOufVOHCxZ1VB3XOCWvtTKSSk2pO2U72ZnWQ5htGtG/wQCq";
 
@@ -340,38 +343,42 @@
     let isAdminMode = false;
     let fechaSorteoTexto = "Por definir";
 
+    // Inicializamos una estructura base vacía de inmediato para que responda al toque
+    for (let i = 1; i <= 100; i++) {
+        ticketsData[i] = { status: 'libre', name: '' };
+    }
+
     function initTickets() {
-        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        if (document.getElementById('modalApartar').style.display === 'flex' || 
+            document.getElementById('modalAdmin').style.display === 'flex') {
+            return;
+        }
+
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?t=${Date.now()}`, {
             headers: { 'X-Master-Key': API_KEY }
         })
         .then(res => res.json())
         .then(resData => {
             const data = resData.record;
             if (data && data.tickets && Object.keys(data.tickets).length > 0) {
-                ticketsData = data.tickets;
-                fechaSorteoTexto = data.fecha || "Por definir";
-                renderGrid();
-                actualizarTextosFecha();
-            } else {
-                inicializarNubeNueva();
+                let hayCambios = JSON.stringify(ticketsData) !== JSON.stringify(data.tickets);
+                if (hayCambios || fechaSorteoTexto !== data.fecha) {
+                    ticketsData = data.tickets;
+                    fechaSorteoTexto = data.fecha || "Por definir";
+                    renderGrid();
+                    actualizarTextosFecha();
+                }
             }
         })
         .catch(err => {
-            console.error("Error sincronizando en directo:", err);
+            console.log("Error de sincronización en red:", err);
         });
-    }
-
-    function inicializarNubeNueva() {
-        ticketsData = {};
-        for (let i = 1; i <= 100; i++) {
-            ticketsData[i] = { status: 'libre', name: '' };
-        }
-        guardarEnServidor();
     }
 
     function guardarEnServidor() {
         actualizarTextosFecha();
         renderGrid();
+        localStorage.setItem('rifa_local_backup', JSON.stringify(ticketsData));
 
         fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
             method: 'PUT',
@@ -380,12 +387,7 @@
                 'X-Master-Key': API_KEY
             },
             body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Guardado en directo exitoso");
-        })
-        .catch(err => console.log("Error al guardar en directo:", err));
+        }).catch(err => console.log("Error guardando:", err));
     }
 
     function actualizarTextosFecha() {
@@ -416,7 +418,7 @@
 
     function handleCellClick(num) {
         selectedNumber = num;
-        const t = ticketsData[num];
+        const t = ticketsData[num] || { status: 'libre', name: '' };
 
         if (isAdminMode) {
             document.getElementById('adminNumText').innerText = num;
@@ -442,16 +444,11 @@
             return;
         }
 
-        // 1. Actualizamos el estado de inmediato en el objeto
         ticketsData[selectedNumber] = { status: 'ocupado', name: nombre };
-        
-        // 2. Guardamos en directo en la nube para que se bloquee para todos
         guardarEnServidor();
-        
         cerrarModal('modalApartar');
 
-        // 3. Abrimos el WhatsApp con el aviso
-        const mensaje = `¡Hola Lenin! Acabo de apartar el número *#${selectedNumber}* de la Rifa Solidaria para Nancy Oberto.\n\nMi nombre es: ${nombre}`;
+        const mensaje = `¡Hola Lenin! Quiero apartar el número *#${selectedNumber}* de la Rifa Solidaria para Nancy Oberto.\n\nMi nombre es: ${nombre}`;
         const urlWhatsApp = `https://wa.me/584127808811?text=${encodeURIComponent(mensaje)}`;
         window.open(urlWhatsApp, '_blank');
     }
@@ -462,13 +459,13 @@
             ticketsData[selectedNumber].name = '';
         }
         guardarCambiosAdminSinCerrar();
-        alert("Estado del número actualizado en directo.");
+        alert("Estado del número actualizado.");
     }
 
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados en directo y sincronizados para todos!");
+        alert("¡Cambios guardados con éxito!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -484,10 +481,13 @@
     }
 
     function resetearTodoPruebas() {
-        if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE en directo?")) {
-            inicializarNubeNueva();
+        if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE?")) {
+            for (let i = 1; i <= 100; i++) {
+                ticketsData[i] = { status: 'libre', name: '' };
+            }
+            guardarEnServidor();
             cerrarModal('modalAdmin');
-            alert("¡Grilla reiniciada en directo para todos!");
+            alert("¡Grilla reiniciada!");
         }
     }
 
@@ -539,7 +539,7 @@
 
         ctx.fillStyle = "#0d47a1";
         ctx.font = "900 75px sans-serif";
-        ctx.fillText("RIFA SOLIDARIA", 110, 170);
+        ctx.fillText("Rifa Solidaria", 110, 170);
 
         ctx.textAlign = "center";
         ctx.fillStyle = "#475569";
@@ -673,11 +673,9 @@
         link.click();
     }
 
-    // Sincronización automática en vivo cada 4 segundos para actualizar la pantalla al instante
-    setInterval(() => {
-        initTickets();
-    }, 4000);
-
+    // Render inicial rápido y sincronización continua
+    renderGrid();
+    setInterval(initTickets, 4000);
     initTickets();
 </script>
 
