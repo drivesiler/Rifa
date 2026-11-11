@@ -330,7 +330,10 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    const KVDB_URL = "https://kvdb.io/FLWKu5aSmguifkdQKwdAXq/rifa"; 
+    
+    // Credenciales oficiales de JSONBin.io integradas
+    const BIN_ID = "6af3c367ac6210605a7e7138"; 
+    const API_KEY = "$2a$10$iTo5N4TOufVOHCxZ1VB3XOCWvtTKSSk2pO2U72ZnWQ5htGtG/wQCq"; 
 
     let ticketsData = {};
     let selectedNumber = null;
@@ -338,24 +341,24 @@
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        fetch(KVDB_URL)
-            .then(res => {
-                if (!res.ok) throw new Error("Vacío");
-                return res.json();
-            })
-            .then(data => {
-                if (data && data.tickets && Object.keys(data.tickets).length > 0) {
-                    ticketsData = data.tickets;
-                    fechaSorteoTexto = data.fecha || "Por definir";
-                    renderGrid();
-                    actualizarTextosFecha();
-                } else {
-                    inicializarNubeNueva();
-                }
-            })
-            .catch(err => {
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': API_KEY }
+        })
+        .then(res => res.json())
+        .then(resData => {
+            const data = resData.record;
+            if (data && data.tickets && Object.keys(data.tickets).length > 0) {
+                ticketsData = data.tickets;
+                fechaSorteoTexto = data.fecha || "Por definir";
+                renderGrid();
+                actualizarTextosFecha();
+            } else {
                 inicializarNubeNueva();
-            });
+            }
+        })
+        .catch(err => {
+            console.error("Error conectando a JSONBin:", err);
+        });
     }
 
     function inicializarNubeNueva() {
@@ -370,12 +373,14 @@
         actualizarTextosFecha();
         renderGrid();
 
-        // KVDB acepta método PUT de manera nativa y directa desde navegadores sin bloqueos CORS
-        fetch(KVDB_URL, {
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY
+            },
             body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
-        }).catch(err => console.log("Error guardando en KVDB:", err));
+        }).catch(err => console.log("Error guardando en JSONBin:", err));
     }
 
     function actualizarTextosFecha() {
@@ -453,7 +458,7 @@
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito en la nube KVDB!");
+        alert("¡Cambios guardados con éxito en la nube JSONBin!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -658,10 +663,10 @@
         link.click();
     }
 
-    // Sincronización automática en vivo cada 5 segundos para actualizar de inmediato entre dispositivos
+    // Sincronización automática en vivo cada 6 segundos consultando la nube
     setInterval(() => {
         initTickets();
-    }, 5000);
+    }, 6000);
 
     initTickets();
 </script>
