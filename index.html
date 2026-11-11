@@ -296,10 +296,10 @@
 <div class="modal" id="modalApartar">
     <div class="modal-content">
         <h3>Apartar Número #<span id="modalNum"></span></h3>
-        <p style="font-size: 0.78rem; color: #555;">Ingresa tu nombre. Al confirmar, se abrirá tu WhatsApp para notificar a Lenin.</p>
+        <p style="font-size: 0.78rem; color: #555;">Ingresa tu nombre. Al confirmar, se guardará en directo y se abrirá tu WhatsApp para notificar a Lenin.</p>
         <label style="font-size: 0.78rem; font-weight: bold;">Nombre y Apellido:</label>
         <input type="text" id="inputNombre" placeholder="Ej. María Gómez">
-        <button class="btn btn-primary" onclick="confirmarApartadoWhatsApp()">Confirmar y Notificar</button>
+        <button class="btn btn-primary" onclick="confirmarApartadoWhatsApp()">Confirmar, Guardar y Notificar</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalApartar')">Cancelar</button>
     </div>
 </div>
@@ -321,7 +321,7 @@
         <label style="font-size: 0.75rem; font-weight:bold;">Nueva Contraseña Admin (Opcional):</label>
         <input type="text" id="inputNuevaPass" placeholder="Dejar en blanco si no deseas cambiarla" style="margin-bottom:8px;">
 
-        <button class="btn btn-primary" style="background:#27ae60; margin-bottom:8px;" onclick="guardarCambiosAdmin()">💾 Guardar Cambios</button>
+        <button class="btn btn-primary" style="background:#27ae60; margin-bottom:8px;" onclick="guardarCambiosAdmin()">💾 Guardar en Directo</button>
         <button class="btn btn-primary" style="background:var(--blue-dark); margin-bottom:5px;" onclick="descargarImagenEstado()">📱 Descargar Imagen para Historia</button>
         <button class="btn" style="background:#d9534f; color:white; margin-bottom:5px;" onclick="resetearTodoPruebas()">🔄 Reiniciar Números (Pruebas)</button>
         <button class="btn btn-secondary" onclick="cerrarModal('modalAdmin')">Cerrar</button>
@@ -330,40 +330,62 @@
 
 <script>
     let ADMIN_PASSWORD = localStorage.getItem('rifa_pass_v1') || "1234";
-    const STORAGE_KEY = 'rifa_solidaria_nancy_v18';
     
+    // Usamos JSONBin en modo público optimizado para lectura y escritura directa sin restricciones de cabeceras
+    const BIN_ID = "6af3c367ac6210605a7e7138";
+    const API_KEY = "$2a$10$iTo5N4TOufVOHCxZ1VB3XOCWvtTKSSk2pO2U72ZnWQ5htGtG/wQCq";
+
     let ticketsData = {};
     let selectedNumber = null;
     let isAdminMode = false;
     let fechaSorteoTexto = "Por definir";
 
     function initTickets() {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-            try { ticketsData = JSON.parse(savedData); } catch (e) { crearNuevosTickets(); }
-        } else {
-            crearNuevosTickets();
-        }
-        const savedFecha = localStorage.getItem(STORAGE_KEY + '_fecha');
-        if (savedFecha) fechaSorteoTexto = savedFecha;
-        
-        actualizarTextosFecha();
-        renderGrid();
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': API_KEY }
+        })
+        .then(res => res.json())
+        .then(resData => {
+            const data = resData.record;
+            if (data && data.tickets && Object.keys(data.tickets).length > 0) {
+                ticketsData = data.tickets;
+                fechaSorteoTexto = data.fecha || "Por definir";
+                renderGrid();
+                actualizarTextosFecha();
+            } else {
+                inicializarNubeNueva();
+            }
+        })
+        .catch(err => {
+            console.error("Error sincronizando en directo:", err);
+        });
     }
 
-    function crearNuevosTickets() {
+    function inicializarNubeNueva() {
         ticketsData = {};
         for (let i = 1; i <= 100; i++) {
             ticketsData[i] = { status: 'libre', name: '' };
         }
-        guardarDatos();
+        guardarEnServidor();
     }
 
-    function guardarDatos() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(ticketsData));
-        localStorage.setItem(STORAGE_KEY + '_fecha', fechaSorteoTexto);
+    function guardarEnServidor() {
         actualizarTextosFecha();
         renderGrid();
+
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY
+            },
+            body: JSON.stringify({ tickets: ticketsData, fecha: fechaSorteoTexto })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Guardado en directo exitoso");
+        })
+        .catch(err => console.log("Error al guardar en directo:", err));
     }
 
     function actualizarTextosFecha() {
@@ -420,33 +442,33 @@
             return;
         }
 
-        // Preparamos el mensaje para tu WhatsApp directamente
-        const mensaje = `¡Hola Lenin! Quiero apartar el número *#${selectedNumber}* de la Rifa Solidaria para Nancy Oberto.\n\nMi nombre es: ${nombre}`;
-        const urlWhatsApp = `https://wa.me/584127808811?text=${encodeURIComponent(mensaje)}`;
+        // 1. Actualizamos el estado de inmediato en el objeto
+        ticketsData[selectedNumber] = { status: 'ocupado', name: nombre };
         
-        window.open(urlWhatsApp, '_blank');
+        // 2. Guardamos en directo en la nube para que se bloquee para todos
+        guardarEnServidor();
+        
         cerrarModal('modalApartar');
+
+        // 3. Abrimos el WhatsApp con el aviso
+        const mensaje = `¡Hola Lenin! Acabo de apartar el número *#${selectedNumber}* de la Rifa Solidaria para Nancy Oberto.\n\nMi nombre es: ${nombre}`;
+        const urlWhatsApp = `https://wa.me/584127808811?text=${encodeURIComponent(mensaje)}`;
+        window.open(urlWhatsApp, '_blank');
     }
 
     function cambiarEstado(nuevoEstado) {
         ticketsData[selectedNumber].status = nuevoEstado;
         if (nuevoEstado === 'libre') {
             ticketsData[selectedNumber].name = '';
-        } else {
-            // Si el admin lo marca como apartado o pagado desde su panel, pide el nombre rápido
-            let nombreAdmin = prompt("Nombre del participante para este número:", ticketsData[selectedNumber].name || "");
-            if (nombreAdmin !== null) {
-                ticketsData[selectedNumber].name = nombreAdmin.trim();
-            }
         }
         guardarCambiosAdminSinCerrar();
-        alert("Estado del número actualizado con éxito.");
+        alert("Estado del número actualizado en directo.");
     }
 
     function guardarCambiosAdmin() {
         guardarCambiosAdminSinCerrar();
         cerrarModal('modalAdmin');
-        alert("¡Cambios guardados con éxito!");
+        alert("¡Cambios guardados en directo y sincronizados para todos!");
     }
 
     function guardarCambiosAdminSinCerrar() {
@@ -458,14 +480,14 @@
             ADMIN_PASSWORD = pInput;
             localStorage.setItem('rifa_pass_v1', ADMIN_PASSWORD);
         }
-        guardarDatos();
+        guardarEnServidor();
     }
 
     function resetearTodoPruebas() {
-        if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE?")) {
-            crearNuevosTickets();
+        if (confirm("¿Estás seguro de reiniciar todos los números a LIBRE en directo?")) {
+            inicializarNubeNueva();
             cerrarModal('modalAdmin');
-            alert("¡Grilla reiniciada!");
+            alert("¡Grilla reiniciada en directo para todos!");
         }
     }
 
@@ -650,6 +672,11 @@
         link.href = canvas.toDataURL('image/png');
         link.click();
     }
+
+    // Sincronización automática en vivo cada 4 segundos para actualizar la pantalla al instante
+    setInterval(() => {
+        initTickets();
+    }, 4000);
 
     initTickets();
 </script>
